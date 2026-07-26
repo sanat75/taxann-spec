@@ -1,0 +1,25 @@
+{
+  "taxpayer": {
+    "firstName": "Sanat",
+    "lastName": "Chaudhary",
+    "ssn": "123-45-6789"
+  },
+  "spouse": null,
+  "filingStatus": "single",
+  "address": {
+    "street": "742 Evergreen Terrace",
+    "city": "Springfield",
+    "state": "IL",
+    "zip": "62704"
+  },
+  "income": {
+    "wagesW2Box1": 92450.50,
+    "householdEmployeeWages": 0,
+    "tipIncome": 0
+  },
+  "computed": {
+    "line1z_totalWages": 92450.50,
+    "line9_totalIncome": 94120.00,
+    "note": "These are produced upstream by the tax engine. The annotation layer only references them; it never adds anything itself."
+  }
+}

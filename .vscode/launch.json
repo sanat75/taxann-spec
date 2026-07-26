@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug renderer — taxpayer 1",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/renderer/render.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "annotations/f1040_2025_slice.json",
+        "data/sample_taxpayer.json",
+        "forms/f1040_2025.pdf",
+        "out_filled.pdf"
+      ]
+    },
+    {
+      "name": "Debug renderer — taxpayer 2",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/renderer/render.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "annotations/f1040_2025_slice.json",
+        "data/sample_taxpayer2.json",
+        "forms/f1040_2025.pdf",
+        "out_filled2.pdf"
+      ]
+    }
+  ]
+}

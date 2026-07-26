@@ -1,0 +1,109 @@
+{
+  "spec": "taxann/1.0",
+  "meta": {
+    "formId": "us-irs-1040",
+    "taxYear": 2025,
+    "revision": "2025",
+    "sourcePdf": "f1040_2025.pdf",
+    "description": "Representative slice of Form 1040 page 1: taxpayer identity (text + comb SSN), filing status (mutually-exclusive choice group), and income lines (raw + computed currency). Coordinates authored from the official fillable PDF's AcroForm field rectangles."
+  },
+  "coordinateSystem": {
+    "origin": "top-left",
+    "unit": "pt",
+    "note": "x measured rightward from the left edge; y measured downward from the top edge. The renderer flips y using each page's height to reach the PDF-native bottom-left system."
+  },
+  "pages": [
+    { "number": 1, "width": 612, "height": 792 }
+  ],
+  "styles": {
+    "text":      { "font": "Helvetica",      "size": 10, "color": "#111111", "align": "left",   "valign": "middle" },
+    "currency":  { "font": "Helvetica",      "size": 10, "color": "#111111", "align": "right",  "valign": "middle" },
+    "combDigit": { "font": "Courier",        "size": 11, "color": "#111111", "align": "center", "valign": "middle" },
+    "check":     { "font": "Helvetica-Bold", "size": 11, "color": "#111111", "align": "center", "valign": "middle" }
+  },
+  "fields": [
+    {
+      "id": "taxpayer_first_name",
+      "type": "text",
+      "page": 1,
+      "style": "text",
+      "source": { "pdfFieldId": "topmostSubform[0].Page1[0].f1_11[0]" },
+      "bounds": { "x": 68.4, "y": 72.5, "width": 168.2, "height": 11.0 },
+      "padding": { "left": 3, "right": 3 },
+      "value": { "ref": "$.taxpayer.firstName" },
+      "overflow": "shrink"
+    },
+    {
+      "id": "taxpayer_last_name",
+      "type": "text",
+      "page": 1,
+      "style": "text",
+      "source": { "pdfFieldId": "topmostSubform[0].Page1[0].f1_12[0]" },
+      "bounds": { "x": 238.6, "y": 72.5, "width": 170.8, "height": 11.0 },
+      "padding": { "left": 3, "right": 3 },
+      "value": { "ref": "$.taxpayer.lastName" },
+      "overflow": "shrink"
+    },
+    {
+      "id": "taxpayer_ssn",
+      "type": "comb",
+      "page": 1,
+      "style": "combDigit",
+      "source": { "pdfFieldId": "topmostSubform[0].Page1[0].f1_13[0]" },
+      "bounds": { "x": 411.4, "y": 72.5, "width": 164.6, "height": 11.0 },
+      "value": { "ref": "$.taxpayer.ssn", "transform": "digitsOnly" },
+      "comb": { "cells": 9, "groupGaps": { "3": 7, "5": 7 } }
+    },
+    {
+      "id": "filing_status",
+      "type": "choiceGroup",
+      "page": 1,
+      "style": "check",
+      "mark": "X",
+      "value": { "ref": "$.filingStatus" },
+      "options": [
+        { "when": "single",                 "bounds": { "x": 97.6,  "y": 206.0, "width": 8, "height": 8 }, "source": { "pdfFieldId": "c1_8=/1" } },
+        { "when": "marriedFilingJointly",    "bounds": { "x": 97.6,  "y": 218.0, "width": 8, "height": 8 }, "source": { "pdfFieldId": "c1_8=/2" } },
+        { "when": "marriedFilingSeparately", "bounds": { "x": 97.6,  "y": 230.0, "width": 8, "height": 8 }, "source": { "pdfFieldId": "c1_8=/3" } },
+        { "when": "headOfHousehold",         "bounds": { "x": 349.6, "y": 206.0, "width": 8, "height": 8 }, "source": { "pdfFieldId": "c1_8=/4" } },
+        { "when": "qualifyingSurvivingSpouse","bounds": { "x": 349.6, "y": 218.0, "width": 8, "height": 8 }, "source": { "pdfFieldId": "c1_8=/5" } }
+      ]
+    },
+    {
+      "id": "line_1a_wages",
+      "type": "currency",
+      "page": 1,
+      "style": "currency",
+      "source": { "pdfFieldId": "topmostSubform[0].Page1[0].f1_47[0]" },
+      "bounds": { "x": 504.0, "y": 450.0, "width": 72.0, "height": 12.0 },
+      "padding": { "right": 4 },
+      "value": { "ref": "$.income.wagesW2Box1", "default": 0, "transform": "roundWholeDollar" },
+      "format": { "decimals": 0, "thousands": true, "negative": "parens" },
+      "overflow": "shrink"
+    },
+    {
+      "id": "line_1z_total_wages",
+      "type": "currency",
+      "page": 1,
+      "style": "currency",
+      "source": { "pdfFieldId": "topmostSubform[0].Page1[0].f1_57[0]" },
+      "bounds": { "x": 504.0, "y": 558.0, "width": 72.0, "height": 12.0 },
+      "padding": { "right": 4 },
+      "value": { "ref": "$.computed.line1z_totalWages", "default": 0, "transform": "roundWholeDollar" },
+      "format": { "decimals": 0, "thousands": true, "negative": "parens" },
+      "overflow": "shrink"
+    },
+    {
+      "id": "line_9_total_income",
+      "type": "currency",
+      "page": 1,
+      "style": "currency",
+      "source": { "pdfFieldId": "topmostSubform[0].Page1[0].f1_73[0]" },
+      "bounds": { "x": 504.0, "y": 726.0, "width": 72.0, "height": 12.0 },
+      "padding": { "right": 4 },
+      "value": { "ref": "$.computed.line9_totalIncome", "default": 0, "transform": "roundWholeDollar" },
+      "format": { "decimals": 0, "thousands": true, "negative": "parens" },
+      "overflow": "shrink"
+    }
+  ]
+}

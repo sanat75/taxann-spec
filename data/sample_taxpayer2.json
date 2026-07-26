@@ -1,0 +1,13 @@
+{
+  "taxpayer": {
+    "firstName": "Bartholomew-Maximilian",
+    "lastName": "Featherstonehaugh-Wetherby",
+    "ssn": "987654321"
+  },
+  "filingStatus": "marriedFilingJointly",
+  "income": { "wagesW2Box1": 5000 },
+  "computed": {
+    "line1z_totalWages": 5000,
+    "line9_totalIncome": -1234.75
+  }
+}

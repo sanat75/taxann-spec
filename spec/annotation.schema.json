@@ -1,0 +1,209 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://instead.example/taxann/1.0/annotation.schema.json",
+  "title": "TaxAnn Annotation Set",
+  "description": "A reusable, taxpayer-agnostic description of how to print values onto the boxes of a U.S. tax form. Contains ZERO taxpayer data.",
+  "type": "object",
+  "required": ["spec", "meta", "coordinateSystem", "pages", "fields"],
+  "additionalProperties": false,
+  "properties": {
+    "spec": {
+      "type": "string",
+      "pattern": "^taxann/\\d+\\.\\d+$",
+      "description": "Spec identifier and version, e.g. 'taxann/1.0'."
+    },
+    "meta": {
+      "type": "object",
+      "required": ["formId", "taxYear", "sourcePdf"],
+      "additionalProperties": true,
+      "properties": {
+        "formId": { "type": "string", "description": "Stable form identity, e.g. 'us-irs-1040'." },
+        "taxYear": { "type": "integer", "description": "Tax year the form applies to." },
+        "revision": { "type": "string", "description": "Form revision / OMB revision tag." },
+        "sourcePdf": { "type": "string", "description": "Filename of the blank source PDF these coordinates were authored against." },
+        "description": { "type": "string" }
+      }
+    },
+    "coordinateSystem": {
+      "type": "object",
+      "required": ["origin", "unit"],
+      "additionalProperties": false,
+      "properties": {
+        "origin": {
+          "type": "string",
+          "enum": ["top-left", "bottom-left"],
+          "description": "Where (0,0) sits and which way y grows. Authoring default is top-left (y grows downward), matching how a human reads a rendered page. The renderer converts to the PDF-native bottom-left system."
+        },
+        "unit": {
+          "type": "string",
+          "enum": ["pt"],
+          "description": "PDF points (72 per inch). Resolution-independent."
+        },
+        "note": { "type": "string" }
+      }
+    },
+    "pages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["number", "width", "height"],
+        "additionalProperties": false,
+        "properties": {
+          "number": { "type": "integer", "minimum": 1 },
+          "width": { "type": "number", "description": "Page width in points." },
+          "height": { "type": "number", "description": "Page height in points; needed to flip the y-axis." }
+        }
+      }
+    },
+    "styles": {
+      "type": "object",
+      "description": "Named, reusable presentation styles referenced by fields. Define once, reuse everywhere.",
+      "additionalProperties": { "$ref": "#/definitions/style" }
+    },
+    "fields": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/field" }
+    }
+  },
+
+  "definitions": {
+    "style": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "font": { "type": "string", "description": "Base-14 PDF font name, e.g. 'Helvetica', 'Courier'." },
+        "size": { "type": "number", "description": "Font size in points (may be reduced by overflow policy 'shrink')." },
+        "color": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+        "align": { "type": "string", "enum": ["left", "center", "right"], "description": "Horizontal alignment inside the box." },
+        "valign": { "type": "string", "enum": ["top", "middle", "bottom"], "description": "Vertical alignment inside the box." }
+      }
+    },
+
+    "valueBinding": {
+      "type": "object",
+      "description": "How to obtain the value for a field. Exactly one of 'ref', 'template', or 'const' must be present.",
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "type": "string",
+          "description": "A restricted JSONPath expression that MUST resolve to exactly one node in the taxpayer data. Supports dot and [index] navigation, e.g. '$.income.w2[0].box1'. Multi-match expressions are a validation error in v1.0."
+        },
+        "template": {
+          "type": "string",
+          "description": "A string with {$.path} placeholders, each resolving to a single node, e.g. '{$.address.city}, {$.address.state} {$.address.zip}'."
+        },
+        "const": {
+          "description": "A literal constant value (rarely needed; useful for fixed marks)."
+        },
+        "transform": {
+          "type": "string",
+          "enum": ["digitsOnly", "roundWholeDollar", "upper", "lower", "trim"],
+          "description": "A single transform from a fixed, closed enum. No arbitrary code is ever evaluated."
+        },
+        "default": {
+          "description": "Value to use when the ref resolves to null/undefined/missing. If absent and value is missing, the field renders blank."
+        }
+      }
+    },
+
+    "bounds": {
+      "type": "object",
+      "required": ["x", "y", "width", "height"],
+      "additionalProperties": false,
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "number" },
+        "height": { "type": "number" }
+      }
+    },
+
+    "padding": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "left": { "type": "number" },
+        "right": { "type": "number" },
+        "top": { "type": "number" },
+        "bottom": { "type": "number" }
+      }
+    },
+
+    "numberFormat": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "decimals": { "type": "integer", "minimum": 0, "description": "Decimal places. IRS whole-dollar lines use 0." },
+        "thousands": { "type": "boolean", "description": "Insert thousands separators (1,234)." },
+        "negative": { "type": "string", "enum": ["minus", "parens"], "description": "Render negatives as -1234 or (1234). Tax forms use 'parens'." }
+      }
+    },
+
+    "source": {
+      "type": "object",
+      "description": "Provenance / migration anchor. The stable PDF AcroForm field id this box was authored from. Enables (a) year-over-year re-anchoring and (b) an optional AcroForm-native render path.",
+      "additionalProperties": true,
+      "properties": {
+        "pdfFieldId": { "type": "string" }
+      }
+    },
+
+    "field": {
+      "type": "object",
+      "required": ["id", "type", "page"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "description": "Human-meaningful semantic id assigned by the annotator, e.g. 'taxpayer_first_name'." },
+        "type": {
+          "type": "string",
+          "enum": ["text", "multiline", "number", "currency", "date", "checkbox", "choiceGroup", "comb"]
+        },
+        "page": { "type": "integer", "minimum": 1 },
+        "style": { "type": "string", "description": "Name of a style in the top-level 'styles' map." },
+        "source": { "$ref": "#/definitions/source" },
+        "bounds": { "$ref": "#/definitions/bounds" },
+        "padding": { "$ref": "#/definitions/padding" },
+        "value": { "$ref": "#/definitions/valueBinding" },
+        "format": { "$ref": "#/definitions/numberFormat" },
+        "overflow": {
+          "type": "string",
+          "enum": ["shrink", "truncate", "clip", "error"],
+          "description": "What to do when the rendered value does not fit the box. Default 'shrink'."
+        },
+        "comb": {
+          "type": "object",
+          "description": "For type 'comb': distribute one value across N evenly spaced cells.",
+          "required": ["cells"],
+          "additionalProperties": false,
+          "properties": {
+            "cells": { "type": "integer", "minimum": 1 },
+            "groupGaps": {
+              "type": "object",
+              "description": "Extra visual gap (pt) BEFORE the cell index given by the key. e.g. {\"3\":6,\"5\":6} for SSN grouping.",
+              "additionalProperties": { "type": "number" }
+            }
+          }
+        },
+        "mark": {
+          "type": "string",
+          "description": "For 'checkbox'/'choiceGroup': the glyph to stamp when selected. Default 'X'."
+        },
+        "options": {
+          "type": "array",
+          "description": "For 'choiceGroup': the mutually exclusive options. The field's resolved value selects exactly one 'when'.",
+          "items": {
+            "type": "object",
+            "required": ["when", "bounds"],
+            "additionalProperties": false,
+            "properties": {
+              "when": { "type": "string", "description": "Value that selects this option." },
+              "bounds": { "$ref": "#/definitions/bounds" },
+              "source": { "$ref": "#/definitions/source" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Render taxpayer 1 (single filer)",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "args": [
+        "renderer/render.py",
+        "annotations/f1040_2025_slice.json",
+        "data/sample_taxpayer.json",
+        "forms/f1040_2025.pdf",
+        "out_filled.pdf"
+      ],
+      "problemMatcher": [],
+      "presentation": { "clear": true, "focus": true }
+    },
+    {
+      "label": "Render taxpayer 2 (MFJ, reuse test)",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "args": [
+        "renderer/render.py",
+        "annotations/f1040_2025_slice.json",
+        "data/sample_taxpayer2.json",
+        "forms/f1040_2025.pdf",
+        "out_filled2.pdf"
+      ],
+      "problemMatcher": [],
+      "presentation": { "clear": true, "focus": true }
+    },
+    {
+      "label": "Validate annotation against schema",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "args": ["tools/validate.py", "annotations/f1040_2025_slice.json"],
+      "problemMatcher": [],
+      "presentation": { "clear": true, "focus": true }
+    },
+    {
+      "label": "Demo: validate + render both",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Validate annotation against schema",
+        "Render taxpayer 1 (single filer)",
+        "Render taxpayer 2 (MFJ, reuse test)"
+      ],
+      "problemMatcher": [],
+      "group": { "kind": "build", "isDefault": true }
+    }
+  ]
+}

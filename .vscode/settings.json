@@ -1,0 +1,25 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+  "python.terminal.activateEnvironment": true,
+
+  // Live-validate annotation sets against the spec while editing.
+  // Typing an invalid field type (e.g. "banana") gets a red squiggle immediately.
+  "json.schemas": [
+    {
+      "fileMatch": ["/annotations/*.json"],
+      "url": "./spec/annotation.schema.json"
+    }
+  ],
+
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.venv": true
+  },
+  "editor.rulers": [88],
+  "[python]": {
+    "editor.tabSize": 4
+  },
+  "[json]": {
+    "editor.tabSize": 2
+  }
+}
